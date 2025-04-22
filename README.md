@@ -1,148 +1,155 @@
-🤖 BOT DETECTION & CHATBOT EXTENSION 
-A fun and powerful tool to find out if an online account is a bot or a human – and talk to your documents like you're chatting with a friend!
+# 🧠 ChatDocAI – Chat with Your Files in the Browser
 
-💡 What is This?
-This is a simple web app that helps you:
+This project enables users to query their local documents through a browser extension that communicates with a powerful AI backend using OpenAI's GPT models and LangChain.
 
-Detect if a social media account is a bot.
+---
 
-Talk to your uploaded files using an AI chatbot (kind of like talking to ChatGPT but only about your documents).
+## 📦 Project Overview
 
-🚀 What Does It Do?
-You fill out a form with details about a social media account.
+This system is made of two main parts:
 
-It guesses if that account is real or a bot, using AI.
+1. **🔙 Flask Backend** (Python)
+   - Loads and embeds local documents
+   - Uses OpenAI + LangChain to generate responses
+   - Answers user questions via an API endpoint
 
-You can also upload text files or PDFs, and the chatbot will answer questions based on those documents.
+2. **🧩 Browser Extension (background.js)**
+   - Listens for messages (user queries)
+   - Sends questions to the Flask server
+   - Receives and displays AI-generated answers
 
-There’s a browser extension that can send questions to the chatbot too!
+---
 
-📦 What's Inside?
-💻 Frontend (What You See)
-React app (in frontend/) that shows the form and results on the website.
+## 🛠️ Technologies Used
 
-Main file: App.js — this shows the form, results, and predictions.
+| Area | Tech |
+|------|------|
+| Backend | Python, Flask, LangChain, OpenAI API, ChromaDB |
+| Frontend | JavaScript (Chrome Extension) |
+| AI/ML | GPT-3.5-Turbo via LangChain |
 
-🧠 Backend (The Brain)
-Flask server (in backend/) that uses AI and machine learning.
+---
 
-Main file: app.py — it reads your files and gives smart answers.
+## 📁 Folder Structure
 
-It also handles predictions (e.g., “Is this account a bot?”).
+project-root/ │ ├── backend/ │ 
+├── app.py # Flask API + LangChain logic │ 
+├── constants.py # Stores your OpenAI API key (not included here) │ └── data/ # Folder containing documents to be embedded │ 
+├── extension/ │ ├── background.js # Chrome extension backend script │ 
+├── manifest.json # (not uploaded, required to run extension) │ └── README.md # This file
 
-🧩 Browser Extension (Optional Bonus)
-File: background.js — this lets you use the chatbot while browsing!
-
-🛠️ How to Set It Up (Step-by-Step)
-✅ 1. Setup the Backend
-Open Terminal or Command Prompt.
-
-Type:
-
-bash
+yaml
 Copy
 Edit
+
+---
+
+## 🚀 How It Works
+
+1. You place files in the `backend/data/` folder (PDF, TXT, etc.).
+2. Flask reads them using LangChain and creates smart indexes.
+3. The Chrome Extension sends your questions to Flask.
+4. Flask returns an answer using OpenAI’s GPT model.
+5. The Extension shows the answer to the user.
+
+---
+
+## 📦 Backend Setup (Flask + LangChain)
+
+### 1. Clone the Repository & Setup Environment
+```bash
 cd backend
-Create a virtual environment:
-
-bash
-Copy
-Edit
 python -m venv venv
-Activate it:
-
-Windows:
-
+source venv/bin/activate   # On Windows use: venv\Scripts\activate
+2. Install Requirements
 bash
 Copy
 Edit
-venv\Scripts\activate
-Mac/Linux:
-
-bash
-Copy
-Edit
-source venv/bin/activate
-Install the tools:
-
-bash
-Copy
-Edit
-pip install flask pandas numpy scikit-learn joblib flask-cors openai langchain chromadb
-Add your OpenAI API key to constants.py like this:
+pip install flask openai langchain chromadb langchain-openai langchain-community
+3. Create constants.py
+In the backend/ folder, create a file named constants.py with:
 
 python
 Copy
 Edit
-APIKEY = "your-openai-api-key"
-Start the server:
+APIKEY = "your-openai-api-key-here"
+4. Add Documents
+Place your .txt, .md, or .pdf files in the folder:
 
+bash
+Copy
+Edit
+backend/data/
+5. Run the Flask App
 bash
 Copy
 Edit
 python app.py
-✅ 2. Setup the Frontend
-Open another terminal window.
+Server will start at http://127.0.0.1:5000
 
-Type:
+🧩 Chrome Extension Setup
+1. Create manifest.json (If not created)
+json
+Copy
+Edit
+{
+  "manifest_version": 3,
+  "name": "ChatDocAI Extension",
+  "version": "1.0",
+  "permissions": ["activeTab", "scripting"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
+Add popup.html and frontend if needed.
+
+2. Load the Extension
+Open Chrome and go to chrome://extensions/
+
+Enable Developer Mode
+
+Click "Load Unpacked"
+
+Select the folder with your background.js and manifest.json
+
+🔄 Communication Flow
+csharp
+Copy
+Edit
+[User Input in Browser]
+        ⬇
+[background.js → sends request]
+        ⬇
+[Flask Server @ localhost:5000/query]
+        ⬇
+[LangChain + GPT generate response]
+        ⬇
+[Response sent back to extension]
+        ⬇
+[Displayed in browser popup]
+🧪 Example API Query (Manual)
+You can test the backend with this curl command:
 
 bash
 Copy
 Edit
-cd frontend
-Install frontend tools:
+curl -X POST http://127.0.0.1:5000/query \
+     -H "Content-Type: application/json" \
+     -d '{"query": "What is this document about?"}'
+🧯 Troubleshooting
+❌ CORS errors? Add flask-cors:
 
 bash
 Copy
 Edit
-npm install
-Start the app:
+pip install flask-cors
+And add in app.py:
 
-bash
+python
 Copy
 Edit
-npm start
-Visit http://localhost:3000 in your browser.
-
-✅ 3. Setup the Extension (Optional)
-Go to chrome://extensions in your Chrome browser.
-
-Turn on Developer Mode (top-right).
-
-Click Load Unpacked.
-
-Select the folder where background.js is located.
-
-Now the extension can send questions to your Flask chatbot!
-
-🧪 How to Use
-👤 Bot Detector
-Fill in the account info (like followers, tweets).
-
-Click “Detect Bot”.
-
-See results and how confident the AI is.
-
-💬 Chat with Your Files
-Upload documents in backend/data/.
-
-Ask questions using the browser extension or any tool connected to the /query endpoint.
-
-📁 Important Files & What They Do
-
-File	What It Does
-app.py	Main backend logic — runs chatbot and handles questions
-background.js	Lets browser extension talk to the chatbot
-App.js	The React UI you interact with
-App.css	Makes the UI look clean and pretty
-index.js	Starts the React app
-package.json	Lists all tools needed for frontend
-🎁 Cool Things to Add (Bonus Ideas)
-Use more training data to improve detection.
-
-Make the chatbot speak or give fun responses.
-
-Turn it into a mobile app!
-
-🧠 Final Thought
-This project is like your own little robot detective mixed with an AI helper. You’re not just building apps — you’re building smart tools that think, talk, and help. Keep experimenting and make it your own! 🛠️✨
+from flask_cors import CORS
+CORS(app)
